@@ -20,17 +20,18 @@ navStructs = extract_topic_from_bag(file_path,...
     '/path_planning_and_following/navigate_to_goal/result');
 
 %% Getting robot state variables
-[pos_body, vel_body, joint_positions] = compute_robot_state(stateStructs);
+[pos_body, vel_body, joint_positions, joint_torques, ...
+    time, t_start, t_end] = compute_robot_state(stateStructs, navStructs, 1);
 
 %% Getting experiment navigation results
 mission_status = compute_mission_status(navStructs);
 
 %% Getting slippage 
-[slippage_num, slippage_den, slippage_squared, ...
-    slippage_norm] = compute_slippage(stateStructs);
+slippage_metric = compute_slippage(stateStructs);
 
-%% Find odom to map trasforms
-Todom2map = get_transforms(tfStructs, 'odom', 'map');
+%% Find odom to map transforms
+Todom2map = get_transforms(tfStructs, 'odom', 'map', length(pos_body), ...
+    t_start, t_end);
 
 %% Get battery state of charge
 battery_SoC = compute_battery_status(batteryStructs);
@@ -38,3 +39,7 @@ battery_SoC = compute_battery_status(batteryStructs);
 %% Get motor current
 % Example only for one motor (copy/paste for others)
 motorCurrent = compute_motor_current(mcurrStructs);
+
+%% Trasforming positions and velocities from odom into map
+pos_base = transform_data(pos_body, Todom2map);
+vel_base = transform_data(vel_body, Todom2map);

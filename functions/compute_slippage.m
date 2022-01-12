@@ -1,4 +1,5 @@
-function [numerator, denominator, slippage_measure_squared, slippage_measure_norm] = compute_slippage(msgStructs, lim_start, lim_end)
+function slippage_measure_norm = compute_slippage(msgStructs, ...
+    lim_start, lim_end)
 % COMPUTE SLIPPAGE
 % Compute the slippage metric from Adaptive Feet for Quadrupedal Walkers
 %
@@ -54,9 +55,9 @@ end
 length_path = sum(sqrt(sum(diff(pos_body).^2')));
 
 % Slippage
-slippage_measure_squared = sum(sum(x_slip.^2 + y_slip.^2 + z_slip.^2))/length_path^2;
+% slippage_measure_squared = sum(sum(x_slip.^2 + y_slip.^2 + z_slip.^2))/length_path^2;
 slippage_measure_norm = sum(sum(sqrt(x_slip.^2 + y_slip.^2 + z_slip.^2)))/length_path;
-numerator = sum(sqrt(x_slip.^2 + y_slip.^2 + z_slip.^2));
-denominator = sqrt(sum(diff(pos_body).^2'));
+% numerator = sum(sqrt(x_slip.^2 + y_slip.^2 + z_slip.^2));
+% denominator = sqrt(sum(diff(pos_body).^2'));
 
 end
