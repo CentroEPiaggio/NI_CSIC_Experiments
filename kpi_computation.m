@@ -4,8 +4,11 @@ clear all; clc;
 addpath('./functions/');
 
 % Input parameters
-bag_path = './bags/';
-bag_file = '_2022-01-11-17-41-00.bag';
+bag_path = '.\bags\12_01_22\0_slope_0_steps\';
+bag_file = '_2022-01-12-12-02-38.bag';
+
+% Load constants
+constants_initialization;
 
 % Derived parameters
 file_path = [bag_path, bag_file];
@@ -42,4 +45,24 @@ motorCurrent = compute_motor_current(mcurrStructs);
 
 %% Trasforming positions and velocities from odom into map
 pos_base = transform_data(pos_body, Todom2map);
-vel_base = transform_data(vel_body, Todom2map);
+vel_base = vel_body;            % Velocity seems to be in base frame
+
+%% Computing KPIs
+% Success (To be computed by hand "mission_status" from two bags of and
+% experiment)
+
+% Normalized Velocity
+speed = arrayfun(@(ROWIDX) norm(vel_base(ROWIDX,:)), (1:size(vel_base,1)).');
+norm_speed = speed./sqrt(g*h_R);
+
+% Cost of Transport
+Energy = battery_SoC(1) - battery_SoC(end);
+distance = sum(sqrt(sum(diff(pos_base).^2')));
+CoT = Energy/(mass_R*g*distance);
+
+% Deviation Index
+int_Dev_y = trapz(pos_base(:,2));
+Dev_y = (h_CoM/h_R)*(1/w_R)*int_Dev_y;
+
+% Slippage
+slippage = slippage_metric;
