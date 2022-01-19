@@ -61,7 +61,7 @@ distance = sum(sqrt(sum(diff(pos_base).^2')));
 CoT = Energy/(mass_R*g*distance);
 
 % Deviation Index
-int_Dev_y = trapz(pos_base(:,2));
+int_Dev_y = trapz(abs(pos_base(:,2)));
 Dev_y = (h_CoM/h_R)*(1/w_R)*int_Dev_y;
 
 % Slippage
