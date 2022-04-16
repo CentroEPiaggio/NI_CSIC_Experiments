@@ -4,8 +4,8 @@ clear all; clc;
 addpath('./functions/');
 
 % Input parameters
-bag_path = '.\bags\12_01_22\0_slope_0_steps\';
-bag_file = '_2022-01-12-12-02-38.bag';
+bag_path = './bags/';
+bag_file = '_2022-01-11-17-41-00.bag';
 
 % Load constants
 constants_initialization;
@@ -59,6 +59,16 @@ norm_speed = speed./sqrt(g*h_R);
 Energy = battery_SoC(1) - battery_SoC(end);
 distance = sum(sqrt(sum(diff(pos_base).^2')));
 CoT = Energy/(mass_R*g*distance);
+
+% Alternative CoT (Using Joint Torques)
+Energy_1 = sum(sqrt(sum(diff(joint_torques).^2')));
+CoT_1 = Energy_1/(mass_R*g*distance);
+
+% Alternative CoT (Using Motor Currents) 
+% N.B. Please extract currents from all motors and add the energies. Here,
+% as an example, only one motor current is extracted in motorCurrent
+Energy_2 = trapz(motorCurrent.^2);
+CoT_2 = Energy_2/(mass_R*g*distance);
 
 % Deviation Index
 int_Dev_y = trapz(abs(pos_base(:,2)));
