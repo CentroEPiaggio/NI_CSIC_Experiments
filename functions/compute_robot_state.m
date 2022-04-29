@@ -1,5 +1,5 @@
 function [pos_body, vel_body, joint_positions, joint_torques, ...
-    time, t_start, t_end] = compute_robot_state(stateStructs, navStructs, flag)
+    time, t_start, t_end, time_mid] = compute_robot_state(stateStructs, navStructs, flag)
 % COMPUTE ROBOT STATE
 % Compute the robot related quantities
 %
@@ -56,8 +56,11 @@ for i = length(time) : -1 : 1
     end
 end
 
+% Find mid time
+t_mid = double(navStructs{2}.Header.Stamp.Sec) + double(navStructs{2}.Header.Stamp.Nsec)*1e-9;
+
 % Find trim indexes and trim all outputs
-[i_start, i_end] = trim_in_time(stateStructs, t_start, t_end);
+[i_start, i_end, i_mid] = trim_in_time(stateStructs, t_start, t_end, t_mid);
 pos_body = pos_body(i_start:i_end,:);
 vel_body = vel_body(i_start:i_end,:);
 joint_positions = joint_positions(i_start:i_end,:);
@@ -66,6 +69,7 @@ time = time(i_start:i_end);
 
 % Refactor time from 0 to end
 time = time - time(1);
+time_mid = t_mid - time(1);
 
 end
 

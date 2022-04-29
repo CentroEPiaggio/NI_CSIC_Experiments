@@ -4,8 +4,8 @@ clear all; clc;
 addpath('./functions/');
 
 % Input parameters
-bag_path = './bags/';
-bag_file = '_2022-01-11-17-41-00.bag';
+bag_path = './bags/forest_280422/csic/';
+bag_file = '_2022-04-28-17-53-06.bag';
 
 % Load constants
 constants_initialization;
@@ -16,7 +16,7 @@ file_path = [bag_path, bag_file];
 % Extract each topic structure from bag
 stateStructs = extract_topic_from_bag(file_path,'/state_estimator/anymal_state');
 tfStructs = extract_topic_from_bag(file_path,'/tf');
-batteryStructs = extract_topic_from_bag(file_path,'/pdb/battery_state');
+batteryStructs = extract_topic_from_bag(file_path,'/pdb/battery_state_ros');
 % Example only for one motor (copy/paste for others)
 mcurrStructs = extract_topic_from_bag(file_path,'/log/state/current/LF_HAA');
 navStructs = extract_topic_from_bag(file_path,...
@@ -56,19 +56,9 @@ speed = arrayfun(@(ROWIDX) norm(vel_base(ROWIDX,:)), (1:size(vel_base,1)).');
 norm_speed = speed./sqrt(g*h_R);
 
 % Cost of Transport
-Energy = battery_SoC(1) - battery_SoC(end);
+Energy = batt_E*(battery_SoC(1) - battery_SoC(end));
 distance = sum(sqrt(sum(diff(pos_base).^2')));
 CoT = Energy/(mass_R*g*distance);
-
-% Alternative CoT (Using Joint Torques)
-Energy_1 = sum(sqrt(sum(diff(joint_torques).^2')));
-CoT_1 = Energy_1/(mass_R*g*distance);
-
-% Alternative CoT (Using Motor Currents) 
-% N.B. Please extract currents from all motors and add the energies. Here,
-% as an example, only one motor current is extracted in motorCurrent
-Energy_2 = trapz(motorCurrent.^2);
-CoT_2 = Energy_2/(mass_R*g*distance);
 
 % Deviation Index
 int_Dev_y = trapz(abs(pos_base(:,2)));
