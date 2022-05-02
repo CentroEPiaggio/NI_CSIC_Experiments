@@ -1,4 +1,4 @@
-function battery_SoC = compute_battery_status(batteryStructs)
+function battery_SoC = compute_battery_status(batteryStructs, t_start, t_end, t_mid)
 % COMPUTE BATTERY STATUS
 % Compute the battere SoC
 %
@@ -7,5 +7,20 @@ function battery_SoC = compute_battery_status(batteryStructs)
 
 % Battery status
 battery_SoC = cellfun(@(m) double(m.Percentage),batteryStructs);
+
+% Find trimming indexes (different from others since different pub rate)
+[i_start, i_end, i_mid] = trim_in_time(batteryStructs, 1e-1, t_start, t_end);
+
+% Split
+if ~exist('t_end','var')
+else
+    battery_SoC = battery_SoC(1:i_end,:);
+end
+
+if ~exist('t_start','var')
+else
+    battery_SoC = battery_SoC(i_start:end,:);
+end
+
 end
 

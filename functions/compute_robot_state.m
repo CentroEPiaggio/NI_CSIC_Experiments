@@ -1,5 +1,6 @@
 function [pos_body, vel_body, joint_positions, joint_torques, ...
-    time, t_start, t_end, time_mid] = compute_robot_state(stateStructs, navStructs, flag)
+    time, t_start, t_end, lim_start, lim_end] = compute_robot_state(stateStructs, ...
+    navStructs, flag, up_down)
 % COMPUTE ROBOT STATE
 % Compute the robot related quantities
 %
@@ -8,8 +9,11 @@ function [pos_body, vel_body, joint_positions, joint_torques, ...
 % navStructs - contains result of
 %       extract_topic_from_bag(file_path,...
 %           '/path_planning_and_following/navigate_to_goal/result');
-% flag	-	0 -> start from when robot moves
+% flag  -	0 -> start from when robot moves
 %       -	1 -> start from when robot reaches first navigation goal
+% up_down   - 'up' -> consider data from first part (down to up)
+%           - 'down' -> consider data from second part (up to down)
+%           - 'full' -> consider data from whole test
 
 % Time
 time = cellfun(@(m) double(m.Header.Stamp.Sec) + double(m.Header.Stamp.Nsec)*1e-9, ...
@@ -59,17 +63,42 @@ end
 % Find mid time
 t_mid = double(navStructs{2}.Header.Stamp.Sec) + double(navStructs{2}.Header.Stamp.Nsec)*1e-9;
 
-% Find trim indexes and trim all outputs
-[i_start, i_end, i_mid] = trim_in_time(stateStructs, t_start, t_end, t_mid);
-pos_body = pos_body(i_start:i_end,:);
-vel_body = vel_body(i_start:i_end,:);
-joint_positions = joint_positions(i_start:i_end,:);
-joint_torques = joint_torques(i_start:i_end,:);
-time = time(i_start:i_end);
+% Find trim indexes
+[i_start, i_end, i_mid] = trim_in_time(stateStructs, 1e-2, t_start, t_end, t_mid);
+
+% Trim according to selected portion
+if strcmp(up_down,'up')
+    pos_body = pos_body(i_start:i_mid,:);
+    vel_body = vel_body(i_start:i_mid,:);
+    joint_positions = joint_positions(i_start:i_mid,:);
+    joint_torques = joint_torques(i_start:i_mid,:);
+    time = time(i_start:i_mid);
+    lim_start = i_start;
+    lim_end = i_mid;
+    t_end = t_mid;
+elseif strcmp(up_down,'down')
+    pos_body = pos_body(i_mid:i_end,:);
+    vel_body = vel_body(i_mid:i_end,:);
+    joint_positions = joint_positions(i_mid:i_end,:);
+    joint_torques = joint_torques(i_mid:i_end,:);
+    time = time(i_mid:i_end);
+    lim_start = i_mid;
+    lim_end = i_end;
+    t_start = t_mid;
+elseif strcmp(up_down,'full')
+    pos_body = pos_body(i_start:i_end,:);
+    vel_body = vel_body(i_start:i_end,:);
+    joint_positions = joint_positions(i_start:i_end,:);
+    joint_torques = joint_torques(i_start:i_end,:);
+    time = time(i_start:i_end);
+    lim_start = i_start;
+    lim_end = i_end;
+else
+    error('Unknown up_down flag!')
+end
 
 % Refactor time from 0 to end
 time = time - time(1);
-time_mid = t_mid - time(1);
 
 end
 
