@@ -6,6 +6,7 @@ addpath('./functions/');
 % Input parameters
 bag_path = './bags/forest_280422/csic/';
 bag_file = '_2022-04-28-17-53-06.bag';
+up_down = 'up';                                 % up / down / full
 
 % Load constants
 constants_initialization;
@@ -24,24 +25,25 @@ navStructs = extract_topic_from_bag(file_path,...
 
 %% Getting robot state variables
 [pos_body, vel_body, joint_positions, joint_torques, ...
-    time, t_start, t_end] = compute_robot_state(stateStructs, navStructs, 1);
+    time, t_start, t_end, lim_start, lim_end] = compute_robot_state(stateStructs, ...
+    navStructs, 1, up_down);
 
 %% Getting experiment navigation results
 mission_status = compute_mission_status(navStructs);
 
 %% Getting slippage 
-slippage_metric = compute_slippage(stateStructs);
+slippage_metric = compute_slippage(stateStructs, lim_start, lim_end);
 
 %% Find odom to map transforms
 Todom2map = get_transforms(tfStructs, 'odom', 'map', length(pos_body), ...
     t_start, t_end);
 
 %% Get battery state of charge
-battery_SoC = compute_battery_status(batteryStructs);
+battery_SoC = compute_battery_status(batteryStructs, t_start, t_end);
 
 %% Get motor current
 % Example only for one motor (copy/paste for others)
-motorCurrent = compute_motor_current(mcurrStructs);
+motorCurrent = compute_motor_current(mcurrStructs, t_start, t_end);
 
 %% Trasforming positions and velocities from odom into map
 pos_base = transform_data(pos_body, Todom2map);
