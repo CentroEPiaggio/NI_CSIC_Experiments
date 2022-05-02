@@ -29,8 +29,7 @@ y_slip = (([dy;[0,0,0,0]] + [[0,0,0,0];dy])/2).*contact;
 dz = diff(z_feet);
 z_slip = (([dz;[0,0,0,0]] + [[0,0,0,0];dz])/2).*contact;
 
-%resize
-
+% Split
 if ~exist('lim_end','var')
 else
     t = t(1:lim_end);
