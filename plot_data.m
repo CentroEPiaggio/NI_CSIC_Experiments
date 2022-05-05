@@ -27,12 +27,12 @@ axis tight
 grid on
 
 % SoC
-% figure
-% hold on
-% plot(time_battery,battery_SoC(:,1),'linewidth',1);
-% legend('$SoC$','FontSize',10,'Interpreter','latex')
-% xlabel('time [s]','Interpreter','latex');
-% ylabel('State of Charge $SoC$','Interpreter','latex');
-% title('State of Charge')
-% axis tight
-% grid on
+figure
+hold on
+plot(time_battery,battery_SoC(:,1),'linewidth',1);
+legend('$SoC$','FontSize',10,'Interpreter','latex')
+xlabel('time [s]','Interpreter','latex');
+ylabel('State of Charge $SoC$','Interpreter','latex');
+title('State of Charge')
+axis tight
+grid on
