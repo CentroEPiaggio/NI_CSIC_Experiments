@@ -1,9 +1,13 @@
-function battery_SoC = compute_battery_status(batteryStructs, t_start, t_end, t_mid)
+function [time_battery, battery_SoC] = compute_battery_status(batteryStructs, t_start, t_end, t_mid)
 % COMPUTE BATTERY STATUS
 % Compute the battere SoC
 %
 % batteryStructs - contains result of 
 %       extract_topic_from_bag(file_path,'/pdb/battery_state');
+
+% Time
+time_battery = cellfun(@(m) double(m.Header.Stamp.Sec) + double(m.Header.Stamp.Nsec)*1e-9, ...
+    batteryStructs);
 
 % Battery status
 battery_SoC = cellfun(@(m) double(m.Percentage),batteryStructs);
@@ -14,13 +18,18 @@ battery_SoC = cellfun(@(m) double(m.Percentage),batteryStructs);
 % Split
 if ~exist('t_end','var')
 else
+    time_battery = time_battery(1:i_end,:);
     battery_SoC = battery_SoC(1:i_end,:);
 end
 
 if ~exist('t_start','var')
 else
+    time_battery = time_battery(i_start:end,:);
     battery_SoC = battery_SoC(i_start:end,:);
 end
+
+% Refactor time from 0 to end
+time_battery = time_battery - time_battery(1);
 
 end
 

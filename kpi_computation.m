@@ -6,7 +6,7 @@ addpath('./functions/');
 % Input parameters
 bag_path = './bags/forest_280422/csic/';
 bag_file = '_2022-04-28-17-53-06.bag';
-up_down = 'up';                                 % up / down / full
+up_down = 'full';                                 % up / down / full
 
 % Load constants
 constants_initialization;
@@ -39,7 +39,7 @@ Todom2map = get_transforms(tfStructs, 'odom', 'map', length(pos_body), ...
     t_start, t_end);
 
 %% Get battery state of charge
-battery_SoC = compute_battery_status(batteryStructs, t_start, t_end);
+[time_battery, battery_SoC] = compute_battery_status(batteryStructs, t_start, t_end);
 
 %% Get motor current
 % Example only for one motor (copy/paste for others)
