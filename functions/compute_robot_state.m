@@ -1,4 +1,4 @@
-function [pos_body, vel_body, joint_positions, joint_torques, ...
+function [pos_body, vel_body, joint_positions, joint_velocities, joint_torques, ...
     time, t_start, t_end, lim_start, lim_end] = compute_robot_state(stateStructs, ...
     navStructs, flag, up_down)
 % COMPUTE ROBOT STATE
@@ -36,6 +36,11 @@ joint_positions = cell2mat(cellfun(@(m) double(m.Joints.Position),stateStructs,.
     'uniformoutput',false));
 joint_positions = reshape(joint_positions,[12,length(stateStructs)]).';
 
+% Joint Velocities
+joint_velocities = cell2mat(cellfun(@(m) double(m.Joints.Velocity),stateStructs,...
+    'uniformoutput',false));
+joint_velocities = reshape(joint_velocities,[12,length(stateStructs)]).';
+
 % Joint Torque
 joint_torques = cell2mat(cellfun(@(m) double(m.Joints.Effort),stateStructs,...
     'uniformoutput',false));
@@ -71,6 +76,7 @@ if strcmp(up_down,'up')
     pos_body = pos_body(i_start:i_mid,:);
     vel_body = vel_body(i_start:i_mid,:);
     joint_positions = joint_positions(i_start:i_mid,:);
+    joint_velocities = joint_velocities(i_start:i_mid,:);
     joint_torques = joint_torques(i_start:i_mid,:);
     time = time(i_start:i_mid);
     lim_start = i_start;
@@ -80,6 +86,7 @@ elseif strcmp(up_down,'down')
     pos_body = pos_body(i_mid:i_end,:);
     vel_body = vel_body(i_mid:i_end,:);
     joint_positions = joint_positions(i_mid:i_end,:);
+    joint_velocities = joint_velocities(i_mid:i_end,:);
     joint_torques = joint_torques(i_mid:i_end,:);
     time = time(i_mid:i_end);
     lim_start = i_mid;
@@ -89,6 +96,7 @@ elseif strcmp(up_down,'full')
     pos_body = pos_body(i_start:i_end,:);
     vel_body = vel_body(i_start:i_end,:);
     joint_positions = joint_positions(i_start:i_end,:);
+    joint_velocities = joint_velocities(i_start:i_end,:);
     joint_torques = joint_torques(i_start:i_end,:);
     time = time(i_start:i_end);
     lim_start = i_start;

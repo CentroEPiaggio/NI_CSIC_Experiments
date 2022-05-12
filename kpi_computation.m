@@ -24,7 +24,7 @@ navStructs = extract_topic_from_bag(file_path,...
     '/path_planning_and_following/navigate_to_goal/result');
 
 %% Getting robot state variables
-[pos_body, vel_body, joint_positions, joint_torques, ...
+[pos_body, vel_body, joint_positions, joint_velocities, joint_torques, ...
     time, t_start, t_end, lim_start, lim_end] = compute_robot_state(stateStructs, ...
     navStructs, 1, up_down);
 
@@ -61,6 +61,10 @@ norm_speed = speed./sqrt(g*h_R);
 Energy = batt_E*(battery_SoC(1) - battery_SoC(end));
 distance = sum(sqrt(sum(diff(pos_base).^2')));
 CoT = Energy/(mass_R*g*distance);
+
+% Alternative CoT (Using Mechanical Energy)
+Energy_1 = trapz(dot(joint_torques,joint_velocities,2));
+CoT_1 = Energy_1/(mass_R*g*distance);
 
 % Deviation Index
 int_Dev_y = trapz(abs(pos_base(:,2)));
