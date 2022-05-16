@@ -4,8 +4,8 @@ clear all; clc;
 addpath('./functions/');
 
 % Input parameters
-bag_path = './bags/forest_280422/csic/';
-bag_file = '_2022-04-28-17-53-06.bag';
+bag_path = './bags/grasslands_120522/0_deg/speed03/';
+bag_file = '_2022-05-12-17-22-27.bag';
 up_down = 'full';                                 % up / down / full
 
 % Load constants
