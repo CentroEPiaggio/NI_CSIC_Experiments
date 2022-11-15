@@ -4,8 +4,8 @@ clear all; clc;
 addpath('./functions/');
 
 % Input parameters
-bag_path = './bags/grasslands_120522/0_deg/speed03/';
-bag_file = '_2022-05-12-17-22-27.bag';
+bag_path = './bags/dataset_grasslands/';
+bag_file = '_2022-05-11-17-48-56.bag';
 up_down = 'full';                                 % up / down / full
 
 % Load constants
@@ -22,10 +22,14 @@ batteryStructs = extract_topic_from_bag(file_path,'/pdb/battery_state_ros');
 mcurrStructs = extract_topic_from_bag(file_path,'/log/state/current/LF_HAA');
 navStructs = extract_topic_from_bag(file_path,...
     '/path_planning_and_following/navigate_to_goal/result');
+trajStructs = extract_topic_from_bag(file_path,...
+    '/path_planning_and_following/trajectory_poses');
+actStructs = extract_topic_from_bag(file_path,...
+    '/path_planning_and_following/active_path');
 
 %% Getting robot state variables
-[pos_body, vel_body, joint_positions, joint_velocities, joint_torques, ...
-    time, t_start, t_end, lim_start, lim_end] = compute_robot_state(stateStructs, ...
+[pos_body, ori_body, vel_body, joint_positions, joint_velocities, joint_accelerations, ...
+    joint_torques, time, t_start, t_end, lim_start, lim_end] = compute_robot_state(stateStructs, ...
     navStructs, 1, up_down);
 
 %% Getting experiment navigation results
@@ -39,14 +43,16 @@ Todom2map = get_transforms(tfStructs, 'odom', 'map', length(pos_body), ...
     t_start, t_end);
 
 %% Get battery state of charge
-[time_battery, battery_SoC] = compute_battery_status(batteryStructs, t_start, t_end);
+[time_battery, battery_SoC, battery_V, battery_C] = compute_battery_status(batteryStructs, ...
+    t_start, t_end);
 
 %% Get motor current
 % Example only for one motor (copy/paste for others)
-motorCurrent = compute_motor_current(mcurrStructs, t_start, t_end);
+[motorCurrent, time_i] = compute_motor_current(mcurrStructs, t_start, t_end);
 
 %% Trasforming positions and velocities from odom into map
 pos_base = transform_data(pos_body, Todom2map);
+ori_base = ori_body;
 vel_base = vel_body;            % Velocity seems to be in base frame
 
 %% Computing KPIs
