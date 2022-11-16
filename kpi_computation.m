@@ -55,6 +55,10 @@ pos_base = transform_data(pos_body, Todom2map);
 ori_base = ori_body;
 vel_base = vel_body;            % Velocity seems to be in base frame
 
+%% Converting orientation into RPY
+rpy = quat2eul(ori_base);
+rpy = unwrap(rpy);
+
 %% Computing KPIs
 % Success (To be computed by hand "mission_status" from two bags of and
 % experiment)
